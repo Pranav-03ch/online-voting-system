@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8" />
+  <title>Voting Results</title>
+  <link rel="stylesheet" th:href="@{/css/style.css}" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar">
+    <a class="logo" th:href="@{/}">Online Voting</a>
+    <ul>
+      <li><a th:href="@{/candidate/add}">Add Candidate</a></li>
+      <li><a th:href="@{/candidates}">All Candidates</a></li>
+      <li><a th:href="@{/results}">View Results</a></li>
+      <li class="logout-item">
+        <form th:action="@{/logout}" method="post">
+          <button type="submit" class="logout-btn">Logout</button>
+        </form>
+      </li>
+    </ul>
+  </nav>
+  
+  <div class="container">
+    <h1>Voting Results</h1>
+    
+    <!-- State Filter Form -->
+    <form th:action="@{/resultsByState}" method="get" class="state-filter-form">
+      <div class="form-group">
+        <label for="stateFilter">Filter by State:</label>
+        <select name="state" id="stateFilter" required>
+          <option value="" disabled selected>Select State</option>
+          <option value="Telangana">Telangana</option>
+          <option value="Andhra Pradesh">Andhra Pradesh</option>
+        </select>
+      </div>
+      <button type="submit" class="btn">Filter Results</button>
+    </form>
+    
+    <!-- Results Table -->
+    <table>
+      <thead>
+        <tr>
+          <th>Candidate</th>
+          <th>Party</th>
+          <th>Votes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr th:each="result : ${results}">
+          <td th:text="${result.candidateName}"></td>
+          <td th:text="${result.party}"></td>
+          <td th:text="${result.votes}"></td>
+        </tr>
+      </tbody>
+    </table>
+    
+    <!-- Results Graph -->
+    <canvas id="resultsChart"></canvas>
+    <script th:inline="javascript">
+      /*<![CDATA[*/
+      var resultsList = /*[[${results}]]*/ [];
+      var candidateNames = [];
+      var voteCounts = [];
+      for (var i = 0; i < resultsList.length; i++) {
+          candidateNames.push(resultsList[i].candidateName);
+          voteCounts.push(resultsList[i].votes);
+      }
+      var ctx = document.getElementById('resultsChart').getContext('2d');
+      new Chart(ctx, {
+          type: 'bar',
+          data: {
+              labels: candidateNames,
+              datasets: [{
+                  label: 'Votes',
+                  data: voteCounts,
+                  backgroundColor: 'rgba(75, 192, 192, 0.8)',
+                  borderColor: 'rgba(75, 192, 192, 1)',
+                  borderWidth: 1
+              }]
+          },
+          options: {
+              responsive: true,
+              scales: {
+                  y: {
+                      beginAtZero: true,
+                      ticks: { precision: 0 }
+                  }
+              }
+          }
+      });
+      /*]]>*/
+    </script>
+  </div>
+  
+  <footer class="footer">
+    <p>&copy; 2025 Online Voting System. All rights reserved.</p>
+  </footer>
+</body>
+</html>

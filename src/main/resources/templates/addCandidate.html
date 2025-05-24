@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8" />
+  <title>Add Candidate</title>
+  <link rel="stylesheet" th:href="@{/css/style.css}" />
+</head>
+<body>
+  <nav class="navbar">
+    <a class="logo" th:href="@{/}">Online Voting</a>
+    <ul>
+      <li><a th:href="@{/candidate/add}">Add Candidate</a></li>
+      <li><a th:href="@{/candidates}">All Candidates</a></li>
+      <li><a th:href="@{/results}">View Results</a></li>
+      <li class="logout-item">
+        <form th:action="@{/logout}" method="post">
+          <button type="submit" class="logout-btn">Logout</button>
+        </form>
+      </li>
+    </ul>
+  </nav>
+  
+  <div class="container">
+    <h1>Add a New Candidate</h1>
+    <form th:action="@{/candidate/add}" th:object="${candidate}" method="post">
+      <div class="form-group">
+        <label for="name">Candidate Name:</label>
+        <input type="text" id="name" th:field="*{name}" placeholder="Enter candidate name" required />
+      </div>
+      <div class="form-group">
+        <label for="party">Party:</label>
+        <input type="text" id="party" th:field="*{party}" placeholder="Enter candidate party" required />
+      </div>
+      <div class="form-group">
+        <label for="state">State:</label>
+        <select id="state" th:field="*{state}" required>
+          <option value="" disabled selected>Select a State</option>
+          <option value="Telangana">Telangana</option>
+          <option value="Andhra Pradesh">Andhra Pradesh</option>
+        </select>
+      </div>
+      <!-- Enhanced Candidate Profile Fields -->
+      <div class="form-group">
+        <label for="bio">Biography:</label>
+        <textarea id="bio" th:field="*{bio}" placeholder="Enter candidate bio"></textarea>
+      </div>
+      <div class="form-group">
+        <label for="photoUrl">Photo URL:</label>
+        <input type="text" id="photoUrl" th:field="*{photoUrl}" placeholder="Enter URL of candidate photo" />
+      </div>
+      <div class="form-group">
+        <label for="manifesto">Manifesto:</label>
+        <textarea id="manifesto" th:field="*{manifesto}" placeholder="Enter candidate manifesto"></textarea>
+      </div>
+      <div class="form-group">
+        <label for="socialMediaLink">Social Media Link:</label>
+        <input type="text" id="socialMediaLink" th:field="*{socialMediaLink}" placeholder="Enter social media URL" />
+      </div>
+      <button type="submit" class="btn">Add Candidate</button>
+    </form>
+  </div>
+</body>
+</html>

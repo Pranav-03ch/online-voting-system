@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8" />
+  <title>Select State</title>
+  <link rel="stylesheet" th:href="@{/css/style.css}" />
+</head>
+<body>
+  <nav class="navbar">
+    <a class="logo" th:href="@{/}">Online Voting</a>
+    <ul>
+      <li><a th:href="@{/candidate/add}">Add Candidate</a></li>
+      <li><a th:href="@{/candidates}">All Candidates</a></li>
+      <li><a th:href="@{/results}">View Results</a></li>
+      <li class="logout-item">
+        <form th:action="@{/logout}" method="post">
+          <button type="submit" class="logout-btn">Logout</button>
+        </form>
+      </li>
+    </ul>
+  </nav>
+  
+  <div class="container">
+    <h1>Select State</h1>
+    <form th:action="@{/candidatesByState}" method="get">
+      <div class="form-group">
+        <label for="state">Choose a State:</label>
+        <select name="state" id="state" required>
+          <option value="" disabled selected>Select a State</option>
+          <option value="Telangana">Telangana</option>
+          <option value="Andhra Pradesh">Andhra Pradesh</option>
+        </select>
+      </div>
+      <button type="submit" class="btn">View Candidates</button>
+    </form>
+  </div>
+</body>
+</html>

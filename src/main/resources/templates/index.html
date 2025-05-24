@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8" />
+  <title>Online Voting System - Home</title>
+  <link rel="stylesheet" th:href="@{/css/style.css}" />
+</head>
+<body>
+  <nav class="navbar">
+    <a class="logo" th:href="@{/}">Online Voting</a>
+    <ul>
+      <li><a th:href="@{/candidate/add}">Add Candidate</a></li>
+      <li><a th:href="@{/candidates}">All Candidates</a></li>
+      <li><a th:href="@{/results}">View Results</a></li>
+      <li class="logout-item">
+        <form th:action="@{/logout}" method="post">
+          <button type="submit" class="logout-btn">Logout</button>
+        </form>
+      </li>
+    </ul>
+  </nav>
+  
+  <header class="hero">
+    <div class="hero-content">
+      <h1>Welcome to the Online Voting System</h1>
+      <p>Your voice matters. Cast your vote securely and transparently.</p>
+      <a th:href="@{/selectState}" class="btn">Get Started</a>
+    </div>
+  </header>
+  
+  <section class="features">
+    <div class="feature">
+      <h2>Secure Voting</h2>
+      <p>Experience a fully secure and transparent voting process.</p>
+    </div>
+    <div class="feature">
+      <h2>Easy Registration</h2>
+      <p>Register quickly and join the election process with ease.</p>
+    </div>
+    <div class="feature">
+      <h2>Real-Time Results</h2>
+      <p>View live updates as votes are cast.</p>
+    </div>
+  </section>
+  
+  <footer class="footer">
+    <p>&copy; 2025 Online Voting System. All rights reserved.</p>
+  </footer>
+</body>
+</html>

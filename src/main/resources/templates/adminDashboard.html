@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Admin Dashboard</title>
+  <link rel="stylesheet" th:href="@{/css/style.css}"/>
+  <!-- Include Chart.js for visualizing vote data -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <!-- Navigation Bar -->
+  <nav class="navbar">
+    <a class="logo" th:href="@{/}">Online Voting Admin</a>
+    <ul>
+      <li><a th:href="@{/admin/dashboard}">Dashboard</a></li>
+      <li><a th:href="@{/candidate/add}">Add Candidate</a></li>
+      <li><a th:href="@{/candidates}">All Candidates</a></li>
+      <li><a th:href="@{/results}">View Results</a></li>
+      <li class="logout-item">
+        <form th:action="@{/logout}" method="post">
+          <button type="submit" class="logout-btn">Logout</button>
+        </form>
+      </li>
+    </ul>
+  </nav>
+  
+  <!-- Main Container -->
+  <div class="container">
+    <h1>Admin Dashboard</h1>
+    
+    <!-- Candidates Table -->
+    <h2>All Candidates</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Name</th>
+          <th>Party</th>
+          <th>State</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr th:each="candidate : ${candidates}">
+          <td th:text="${candidate.id}"></td>
+          <td th:text="${candidate.name}"></td>
+          <td th:text="${candidate.party}"></td>
+          <td th:text="${candidate.state}"></td>
+        </tr>
+      </tbody>
+    </table>
+    
+    <!-- Voting Results Table -->
+    <h2>Voting Results</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Candidate</th>
+          <th>Party</th>
+          <th>Votes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Note: We add an id attribute for each vote cell using the candidateId -->
+        <tr th:each="result : ${results}">
+          <td th:text="${result.candidateName}"></td>
+          <td th:text="${result.party}"></td>
+          <td id="voteCount-[[${result.candidateId}]]" th:text="${result.votes}"></td>
+        </tr>
+      </tbody>
+    </table>
+    
+    <!-- Results Graph -->
+    <h2>Results Graph</h2>
+    <canvas id="resultsChart"></canvas>
+    <script th:inline="javascript">
+      /*<![CDATA[*/
+      // Prepare initial chart data from the results passed from the controller.
+      var resultsList = /*[[${results}]]*/ [];
+      var candidateNames = [];
+      var voteCounts = [];
+      for (var i = 0; i < resultsList.length; i++) {
+          candidateNames.push(resultsList[i].candidateName);
+          voteCounts.push(resultsList[i].votes);
+      }
+      // Initialize Chart.js bar chart
+      var ctx = document.getElementById('resultsChart').getContext('2d');
+      var chart = new Chart(ctx, {
+          type: 'bar',
+          data: {
+              labels: candidateNames,
+              datasets: [{
+                  label: 'Votes',
+                  data: voteCounts,
+                  backgroundColor: 'rgba(75, 192, 192, 0.8)',
+                  borderColor: 'rgba(75, 192, 192, 1)',
+                  borderWidth: 1
+              }]
+          },
+          options: {
+              responsive: true,
+              scales: {
+                  y: {
+                      beginAtZero: true,
+                      ticks: { precision: 0 }
+                  }
+              }
+          }
+      });
+      /*]]>*/
+    </script>
+  </div>
+  
+  <!-- Footer -->
+  <footer class="footer">
+    <p>&copy; 2025 Online Voting System. All rights reserved.</p>
+  </footer>
+  
+  <!-- Include SockJS and STOMP libraries for WebSocket support -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.0/sockjs.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+  
+  <!-- Frontend JavaScript to Listen for Real-Time Vote Updates -->
+  <script th:inline="javascript">
+    /*<![CDATA[*/
+    // Create a SockJS connection to '/ws' (configured in WebSocketConfig.java)
+    var socket = new SockJS('/ws');
+    // Create a STOMP client over the SockJS connection
+    var stompClient = Stomp.over(socket);
+    
+    // Connect to the STOMP broker without any headers
+    stompClient.connect({}, function(frame) {
+        console.log('Connected: ' + frame);
+        // Subscribe to the topic that broadcasts vote updates
+        stompClient.subscribe('/topic/voteUpdates', function(message) {
+            // Parse the incoming message JSON
+            var update = JSON.parse(message.body);
+            console.log("Candidate " + update.candidateName + " now has " + update.voteCount + " votes.");
+            
+            // Update the vote count in the Voting Results table
+            var voteElement = document.getElementById('voteCount-' + update.candidateId);
+            if (voteElement) {
+                voteElement.innerText = update.voteCount;
+            }
+            
+            // Update the Chart.js dataset if the candidate is already plotted
+            var index = candidateNames.indexOf(update.candidateName);
+            if (index !== -1) {
+                chart.data.datasets[0].data[index] = update.voteCount;
+                chart.update();
+            }
+        });
+    });
+    /*]]>*/
+  </script>
+</body>
+</html>

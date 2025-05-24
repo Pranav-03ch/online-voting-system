@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8" />
+  <title>Two-Factor Authentication</title>
+  <link rel="stylesheet" th:href="@{/css/style.css}" />
+</head>
+<body>
+  <div class="login-container">
+    <h1>Two-Factor Authentication</h1>
+    <form th:action="@{/2fa}" method="post">
+      <div class="form-group">
+        <label for="code">Enter the code from your authenticator app:</label>
+        <input type="number" id="code" name="code" required/>
+      </div>
+      <button type="submit" class="btn">Verify</button>
+    </form>
+    <div th:if="${error}">
+      <p class="error" th:text="${error}"></p>
+    </div>
+  </div>
+</body>
+</html>

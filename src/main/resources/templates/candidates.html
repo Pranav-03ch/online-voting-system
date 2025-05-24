@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+  <meta charset="UTF-8" />
+  <title>All Candidates</title>
+  <link rel="stylesheet" th:href="@{/css/style.css}" />
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar">
+    <a class="logo" th:href="@{/}">Online Voting</a>
+    <ul>
+      <sec:authorize access="hasRole('ADMIN')">
+        <li><a th:href="@{/candidate/add}">Add Candidate</a></li>
+      </sec:authorize>
+      <li><a th:href="@{/candidates}">All Candidates</a></li>
+      <li><a th:href="@{/results}">View Results</a></li>
+      <li class="logout-item">
+        <form th:action="@{/logout}" method="post">
+          <button type="submit" class="logout-btn">Logout</button>
+        </form>
+      </li>
+    </ul>
+  </nav>
+  
+  <!-- Optional debug output for roles (remove in production) -->
+  <!-- <p>DEBUG Roles: <span sec:authentication="principal.authorities"></span></p> -->
+  
+  <div class="container">
+    <h1>All Candidates</h1>
+    <ul class="candidate-list">
+      <li class="candidate-item" th:each="candidate : ${candidates}">
+        <div class="candidate-info">
+          <!-- Candidate Photo -->
+          <div class="candidate-photo" th:if="${candidate.photoUrl != null and candidate.photoUrl != ''}">
+            <img th:src="${candidate.photoUrl}" alt="Photo of [[${candidate.name}]]" style="max-width: 100px; border-radius: 5px;" />
+          </div>
+          <!-- Candidate Details -->
+          <div class="candidate-details">
+            <h2 th:text="${candidate.name}"></h2>
+            <p><strong>Party:</strong> <span th:text="${candidate.party}"></span></p>
+            <p><strong>State:</strong> <span th:text="${candidate.state}"></span></p>
+            <p th:if="${candidate.manifesto != null and candidate.manifesto != ''}" style="margin-top: 0.5rem;">
+              <strong>Manifesto:</strong> <span th:text="${candidate.manifesto}"></span>
+            </p>
+          </div>
+        </div>
+        <!-- Vote Form -->
+        <form th:action="@{/vote}" method="post" class="candidate-action">
+          <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+          <input type="hidden" name="candidateId" th:value="${candidate.id}" />
+          <button class="btn-vote" type="submit">Vote</button>
+        </form>
+        <!-- Delete Form: Only visible to ADMIN users -->
+        <sec:authorize access="hasRole('ADMIN')">
+          <form th:action="@{/candidate/delete}" method="post" class="candidate-action" style="margin-left: 1rem;">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+            <input type="hidden" name="candidateId" th:value="${candidate.id}" />
+            <button class="btn" style="background: white;" type="submit">Delete</button>
+          </form>
+        </sec:authorize>
+      </li>
+    </ul>
+  </div>
+</body>
+</html>
